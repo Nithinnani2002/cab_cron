@@ -8,7 +8,7 @@ const SMS_MESSAGES = [
 
 export default function App() {
   const [active, setActive] = useState(true);
-  const [log, setLog] = useState(["⏰ System ready — waiting for 5:00 PM..."]);
+  const [log, setLog] = useState(["⏰ System ready — waiting for 5:15 PM..."]);
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [nextSlot, setNextSlot] = useState("");
@@ -23,7 +23,7 @@ export default function App() {
     function updateCountdown() {
       const now = new Date();
       const target = new Date();
-      target.setHours(17, 0, 0, 0);
+      target.setHours(17, 15, 0, 0); // Changed to 5:15 PM (17:15)
       if (target < now) {
         setCountdown("✅ Done!");
         setNextSlot("All reminders fired for today");
@@ -34,7 +34,7 @@ export default function App() {
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
       setCountdown(`${h}h ${m}m ${s}s`);
-      setNextSlot("Today — 5:00 PM • 3 reminders every 5 mins");
+      setNextSlot("Today — 5:15 PM • 3 reminders every 1 min");
     }
     updateCountdown();
     const t = setInterval(updateCountdown, 1000);
@@ -47,11 +47,11 @@ export default function App() {
       const now = new Date();
       const hour = now.getHours();
       const min = now.getMinutes();
-      if (hour === 17) {
+      if (hour === 17) { // 5 PM hour
         let slot = -1;
-        if (min >= 0 && min < 5) slot = 0;
-        else if (min >= 5 && min < 10) slot = 1;
-        else if (min >= 10 && min < 15) slot = 2;
+        if (min >= 15 && min < 16) slot = 0;      // First at 5:15
+        else if (min >= 16 && min < 17) slot = 1; // Second at 5:16
+        else if (min >= 17 && min < 18) slot = 2; // Third at 5:17
         if (slot >= 0 && slotRef.current <= slot) {
           slotRef.current = slot + 1;
           await fireReminder(slot);
@@ -144,8 +144,8 @@ export default function App() {
         </div>
 
         <div style={s.card}>
-          <div style={s.label}>📅 Today's Test Schedule</div>
-          {[["5:00 PM", "SMS + Email 📧"], ["5:05 PM", "SMS + Email 📧"], ["5:10 PM", "SMS + Email 📧 (final)"]].map(([t, w]) => (
+          <div style={s.label}>📅 Today's Schedule</div>
+          {[["5:15 PM", "SMS + Email 📧"], ["5:16 PM", "SMS + Email 📧"], ["5:17 PM", "SMS + Email 📧 (final)"]].map(([t, w]) => (
             <div key={t} style={s.row}>
               <span style={{ color: "#fff", fontWeight: "500" }}>{t}</span>
               <span style={{ color: "#888" }}>{w}</span>
@@ -170,7 +170,7 @@ export default function App() {
         </div>
 
         <div style={{ textAlign: "center", fontSize: "11px", color: "#333", paddingBottom: "24px" }}>
-          ⚠️ Keep this tab open until 5:10 PM • Built with love 💕
+          ⚠️ Keep this tab open until 5:17 PM • Built with love 💕
         </div>
       </div>
     </div>
