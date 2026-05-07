@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "build",
+  "framework": "create-react-app",
+  "crons": [
+    { "path": "/api/cron?slot=1", "schedule": "0 12 * * *" },
+    { "path": "/api/cron?slot=2", "schedule": "2 12 * * *" },
+    { "path": "/api/cron?slot=3", "schedule": "4 12 * * *" }
+  ]
+}
