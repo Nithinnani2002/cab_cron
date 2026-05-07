@@ -8,14 +8,14 @@ const SMS_MESSAGES = [
 
 export default function App() {
   const [active, setActive] = useState(true);
-  const [log, setLog] = useState(["⏰ System ready — waiting for 5:15 PM..."]);
+  const [log, setLog] = useState(["⏰ System ready — waiting for 5:20 PM..."]);
   const [sending, setSending] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [nextSlot, setNextSlot] = useState("");
   const slotRef = useRef(0);
 
   function addLog(msg) {
-    const now = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" });
+    const now = new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     setLog(prev => [`${now} — ${msg}`, ...prev].slice(0, 30));
   }
 
@@ -23,7 +23,7 @@ export default function App() {
     function updateCountdown() {
       const now = new Date();
       const target = new Date();
-      target.setHours(17, 15, 0, 0); // Changed to 5:15 PM (17:15)
+      target.setHours(17, 20, 0, 0); // Changed to 5:20 PM (17:20)
       if (target < now) {
         setCountdown("✅ Done!");
         setNextSlot("All reminders fired for today");
@@ -34,7 +34,7 @@ export default function App() {
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
       setCountdown(`${h}h ${m}m ${s}s`);
-      setNextSlot("Today — 5:15 PM • 3 reminders every 1 min");
+      setNextSlot("Today — 5:20 PM • 3 reminders every 30 sec");
     }
     updateCountdown();
     const t = setInterval(updateCountdown, 1000);
@@ -47,18 +47,24 @@ export default function App() {
       const now = new Date();
       const hour = now.getHours();
       const min = now.getMinutes();
+      const sec = now.getSeconds();
+      
       if (hour === 17) { // 5 PM hour
         let slot = -1;
-        if (min >= 15 && min < 16) slot = 0;      // First at 5:15
-        else if (min >= 16 && min < 17) slot = 1; // Second at 5:16
-        else if (min >= 17 && min < 18) slot = 2; // Third at 5:17
+        // First reminder at 5:20:00 - 5:20:29
+        if (min === 20 && sec >= 0 && sec < 30) slot = 0;
+        // Second reminder at 5:20:30 - 5:20:59
+        else if (min === 20 && sec >= 30 && sec < 60) slot = 1;
+        // Third reminder at 5:21:00 - 5:21:29
+        else if (min === 21 && sec >= 0 && sec < 30) slot = 2;
+        
         if (slot >= 0 && slotRef.current <= slot) {
           slotRef.current = slot + 1;
           await fireReminder(slot);
         }
       }
     }
-    const t = setInterval(checkAndFire, 10000);
+    const t = setInterval(checkAndFire, 5000); // Check every 5 seconds for more precision
     return () => clearInterval(t);
   }, [active]);
 
@@ -145,7 +151,7 @@ export default function App() {
 
         <div style={s.card}>
           <div style={s.label}>📅 Today's Schedule</div>
-          {[["5:15 PM", "SMS + Email 📧"], ["5:16 PM", "SMS + Email 📧"], ["5:17 PM", "SMS + Email 📧 (final)"]].map(([t, w]) => (
+          {[["5:20:00 PM", "SMS + Email 📧"], ["5:20:30 PM", "SMS + Email 📧"], ["5:21:00 PM", "SMS + Email 📧 (final)"]].map(([t, w]) => (
             <div key={t} style={s.row}>
               <span style={{ color: "#fff", fontWeight: "500" }}>{t}</span>
               <span style={{ color: "#888" }}>{w}</span>
@@ -170,7 +176,7 @@ export default function App() {
         </div>
 
         <div style={{ textAlign: "center", fontSize: "11px", color: "#333", paddingBottom: "24px" }}>
-          ⚠️ Keep this tab open until 5:17 PM • Built with love 💕
+          ⚠️ Keep this tab open until 5:21 PM • Built with love 💕
         </div>
       </div>
     </div>
